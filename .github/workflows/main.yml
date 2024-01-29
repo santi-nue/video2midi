@@ -31,6 +31,10 @@ jobs:
         with:
           path: ~/.cache
           key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: poetry init
+        run: poetry init
+          
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
       - name: Install library
