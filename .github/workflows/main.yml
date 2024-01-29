@@ -61,9 +61,9 @@ jobs:
       - name: Export requirements file from lock file
         run: |
           poetry export -f requirements.txt --output requirements.txt          
-      - name: Build the executable
-        run: |
-          poetry run pyoxidizer build
+#      - name: Build the executable
+#        run: |
+#          poetry run pyoxidizer build
       - name: Create zip of the build
         run: |
           python -c "import shutil; shutil.make_archive('release', 'zip', 'build/dist/')"
