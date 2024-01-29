@@ -1,41 +1,57 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
-name: v2m-ci
+name: test
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [3.7, 3.8, 3.9]
-
+  test-windows:
+    defaults:
+      run:
+        shell: bash
+    runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: |
-        python -m pytest
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Set up python
+        id: setup-python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install asterix-lib
+        run: |
+          pip install https://zoranbosnjak.github.io/asterix-lib-generator/lib/python/asterix-lib.tgz
+          python -c "import asterix; print(asterix.manifest); print(asterix.VERSION)"
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      - name: Load cached venv
+        id: cached-pip-wheels
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+      - name: Install library
+        run: poetry install --no-interaction
+      - run: |
+          source $VENV
+          # pytest --version
+      - name: Export requirements file from lock file
+        run: |
+          poetry export -f requirements.txt --output requirements.txt          
+      - name: Build the executable
+        run: |
+          poetry run pyoxidizer build
+      - name: Create zip of the build
+        run: |
+          python -c "import shutil; shutil.make_archive('release', 'zip', 'build/dist/')"
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ast-tool
+          path: |
+            release.zip
