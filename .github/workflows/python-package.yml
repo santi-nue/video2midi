@@ -19,10 +19,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: Install asterix-lib
-        run: |
-          pip install https://zoranbosnjak.github.io/asterix-lib-generator/lib/python/asterix-lib.tgz
-          python -c "import asterix; print(asterix.manifest); print(asterix.VERSION)"
+
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:
@@ -52,6 +49,6 @@ jobs:
           python -c "import shutil; shutil.make_archive('release', 'zip', 'build/dist/')"
       - uses: actions/upload-artifact@v3
         with:
-          name: ast-tool
+          name: video2midi
           path: |
             release.zip
