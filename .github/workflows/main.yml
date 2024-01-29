@@ -51,4 +51,4 @@ jobs:
         with:
           name: video2midi
           path: |
-            release.zip
+            video2midi.zip
