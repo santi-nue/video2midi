@@ -33,7 +33,7 @@ jobs:
 
       - name: pyoxidizer init-config-file
         run: |
-          pyoxidizer init-config-file
+          pyoxidizer init-config-file .
 
       - name: Update PATH in Windows
         shell: pwsh
