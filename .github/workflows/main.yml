@@ -28,9 +28,12 @@ jobs:
           virtualenvs-in-project: true
 
       - name: install pyoxidizer
-        shell: bash
         run: |
-          cargo install pyoxidizer
+          python3 -m pip install pyoxidizer
+
+      - name: pyoxidizer init-config-file
+        run: |
+          pyoxidizer init-config-file
 
       - name: Update PATH in Windows
         shell: pwsh
