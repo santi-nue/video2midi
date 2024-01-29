@@ -28,6 +28,7 @@ jobs:
 
 
       - name: Update PATH in Windows
+        shell: pwsh
         run: |
           Add-Content -Path $env:GITHUB_PATH -Value "$env:USERPROFILE\.poetry\bin"
           Get-Content -Path $env:GITHUB_PATH
